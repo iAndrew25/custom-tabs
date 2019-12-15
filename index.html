@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		.menu {
+			display: inline-block;
+			padding: 5px 10px;
+			background-color: #eee;
+			cursor: pointer
+		}
+	</style>
+</head>
+<body>
+	<span class="menu">Page 1</span>
+	<span class="menu">Page 2</span>
+	<span class="menu">Page 3</span>
+
+	<script src="page.js"></script>
+<script>
+	const list = [{
+		id: 0,
+		title: 'Title 1',
+		subtitle: 'Subtitle 1'
+	}, {
+		id: 1,
+		title: 'Title 2',
+		subtitle: 'Subtitle 2'
+	}, {
+		id: 2,
+		title: 'Title 3',
+		subtitle: 'Subtitle 3'
+	}];
+
+	const parentElement = document.createElement('ul');
+	const scope = new Proxy({
+		displayPage: 0,
+		pages: {}
+	}, {
+		set: function(obj, prop, value) {
+			if(prop === 'displayPage' && obj.displayPage !== value) {
+				renderPage(value);
+			}
+			
+			obj[prop] = value;
+			return true;
+		}
+	});
+
+	[...document.getElementsByClassName('menu')].forEach((element, key) => {
+		element.addEventListener('click', () => {
+			scope.displayPage = key;
+		});
+	});
+
+	function init() {
+		document.body.appendChild(parentElement);
+
+		list.forEach((data, key) => scope.pages[key] = getPageContent({data, key}));
+
+		renderPage(scope.displayPage);
+	}
+		
+	function renderPage(value) {
+		parentElement.innerHTML = '';
+		parentElement.appendChild(scope.pages[value]);
+	}
+
+	function getPageContent({data, key, classes = []}) {
+		const element = document.createElement('custom-page');
+		element.setProps(data);
+
+		return element;
+	}
+
+	init();
+</script>
+</body>
+</html>
