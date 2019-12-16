@@ -17,7 +17,8 @@
 	<span class="menu">Page 2</span>
 	<span class="menu">Page 3</span>
 
-	<script src="page.js"></script>
+	<script src="custom-tab.js"></script>
+	<script src="custom-tabs.js"></script>
 <script>
 	const list = [{
 		id: 0,
@@ -33,48 +34,10 @@
 		subtitle: 'Subtitle 3'
 	}];
 
-	const parentElement = document.createElement('ul');
-	const scope = new Proxy({
-		displayPage: 0,
-		pages: {}
-	}, {
-		set: function(obj, prop, value) {
-			if(prop === 'displayPage' && obj.displayPage !== value) {
-				renderPage(value);
-			}
-			
-			obj[prop] = value;
-			return true;
-		}
-	});
+	const element = document.createElement('custom-tabs');
+	element.setProps({list});
 
-	[...document.getElementsByClassName('menu')].forEach((element, key) => {
-		element.addEventListener('click', () => {
-			scope.displayPage = key;
-		});
-	});
-
-	function init() {
-		document.body.appendChild(parentElement);
-
-		list.forEach((data, key) => scope.pages[key] = getPageContent({data, key}));
-
-		renderPage(scope.displayPage);
-	}
-		
-	function renderPage(value) {
-		parentElement.innerHTML = '';
-		parentElement.appendChild(scope.pages[value]);
-	}
-
-	function getPageContent({data, key, classes = []}) {
-		const element = document.createElement('custom-page');
-		element.setProps(data);
-
-		return element;
-	}
-
-	init();
+	document.body.appendChild(element);
 </script>
 </body>
 </html>
